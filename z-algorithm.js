@@ -24,8 +24,6 @@ function z_algorithm(){
     let num_mismatch = 0
     let new_string = pattern + "$" + string
 
-    console.log(new_string)
-
     let z = Array(new_string.length).fill(0)
     let k = 1
     let left = 0
@@ -63,9 +61,6 @@ function z_algorithm(){
         k += 1
     }
     
-    stats_inner = `number of comparisons: ${num_match+num_mismatch}; length of string: ${string.length}`
-    stats.innerHTML = stats_inner
-
     // find relevant matches in the actual string, aka everything after |P|+1
     indices = []
     for(let i = pattern.length+1; i < new_string.length; i++){
@@ -73,7 +68,13 @@ function z_algorithm(){
             indices.push(i - pattern.length - 1)
         }
     }
-    console.log(indices)
+    stats_inner = `number of comparisons: ${num_match+num_mismatch}; length of string: ${string.length} <br> indices:
+                  <div style="display:flex; flex-direction:row; flex-wrap:wrap"> 
+                  ${indices.map((i) => {
+                        return `<div style="margin: 10px" onmouseover="onHover(this)" onmouseleave="onHoverExit(this)">${i}</div>`
+                  }).join("")}
+                  </div>`
+    stats.innerHTML = stats_inner
     populate_mirror(indices, string, pattern)
 }
 
@@ -85,10 +86,22 @@ function populate_mirror(indices, string, pattern) {
     indices.forEach(i => {
         if (i < current) return
         html += string.slice(current, i)
-        html += `<span class="highlighted">${string.slice(i, i + pattern_len)}</span>`;
+        html += `<span class="highlighted" id="index-${i}">${string.slice(i, i + pattern_len)}</span>`;
         current = i + pattern_len;
     })
 
     html += string.slice(current)
     mirror_text.innerHTML = html
+}
+
+function onHover(x){
+    highlighted = document.getElementById(`index-${x.innerText}`)
+    highlighted.classList.remove("highlighted")
+    highlighted.classList.add("hovered")
+}
+
+function onHoverExit(x){
+    highlighted = document.getElementById(`index-${x.innerText}`)
+    highlighted.classList.remove("hovered")
+    highlighted.classList.add("highlighted")
 }
